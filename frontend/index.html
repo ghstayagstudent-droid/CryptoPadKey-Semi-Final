@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#11111b">
+  <meta name="description" content="CryptoPad is a local-first notepad interface for ElGamal-encrypted notes.">
+  <title>CryptoPad — ElGamal Encrypted Local Notepad</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- The landing page is the initial view. A backend can serve the workspace
+       route after key generation or note verification is complete. -->
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="CryptoPad home">
+        <span class="brand-mark" aria-hidden="true"><span class="brand-c">C</span><span class="brand-lock">◆</span></span>
+        <span class="brand-word">CryptoPad<small>LOCAL · ENCRYPTED · PRIVATE</small></span>
+      </a>
+      <div class="nav-actions">
+        <span class="connection"><span class="pulse" aria-hidden="true"></span> LOCAL MODE</span>
+        <!-- Native dialog targets need a small backend/browser integration to open without JS. -->
+        <a class="button button-outline" href="#user-guide">User guide <span aria-hidden="true">ⓘ</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="home">
+    <section class="hero hero-section container" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-line"></span> YOUR NOTES. YOUR KEYS. YOUR DEVICE.</p>
+        <h1 id="hero-title">WELCOME TO<br><span>CRYPTO PAD</span></h1>
+        <p class="hero-subtitle">Local Notepad<br>with ElGamal Encryption</p>
+        <p class="hero-security"><span aria-hidden="true">◈</span> Encrypt notes with a public key and decrypt with its matching private key</p>
+        <div class="hero-proof" aria-label="Privacy features">
+          <span><b>01</b> Keys stay in memory</span><span><b>02</b> Files stay local</span><span><b>03</b> Decrypt when needed</span>
+        </div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="shield"><div class="shield-inner"><span class="shield-check">✓</span><span class="shield-label">VERIFIED</span></div></div>
+        <span class="art-code code-top">DSA / 2048</span><span class="art-code code-bottom">SHA-256 · LOCAL</span>
+        <span class="art-dot dot-one"></span><span class="art-dot dot-two"></span><span class="art-dot dot-three"></span>
+      </div>
+    </section>
+
+    <section class="entry-grid container" aria-label="Start or open a signed session">
+      <article class="panel start-panel">
+        <div class="panel-heading"><div class="panel-icon green-icon" aria-hidden="true">⌘</div><div><p class="panel-kicker">GET STARTED</p><h2>Start Encryption Session</h2></div><span class="step-number">01</span></div>
+        <p class="panel-description">Create an ElGamal keypair for this session. Your master key protects the private key in saved encrypted notes.</p>
+        <!-- Names and IDs are stable hooks for a Flask or Java form handler. -->
+        <form action="/session/create" method="post" class="form-stack">
+          <label for="master-passphrase">Master key for saved notes</label>
+          <div class="input-wrap"><span aria-hidden="true">▣</span><input id="master-passphrase" name="master_passphrase" type="password" autocomplete="new-password" placeholder="Create a master key (12+ characters)" required minlength="12"><span class="input-hint">12+ chars</span></div>
+          <label for="confirm-passphrase">Confirm master key</label>
+          <div class="input-wrap"><span aria-hidden="true">▣</span><input id="confirm-passphrase" name="confirm_passphrase" type="password" autocomplete="new-password" placeholder="Re-enter your passphrase" required minlength="12"></div>
+          <label class="check-row" for="volatile-ack"><input id="volatile-ack" name="volatile_acknowledged" type="checkbox" required><span class="custom-check" aria-hidden="true"></span><span>I understand saved notes require this master key and it cannot be recovered if lost.</span></label>
+          <button class="button button-primary button-full" type="submit">Generate ElGamal Keypair &amp; Enter Workspace <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="panel-footnote"><span aria-hidden="true">⌁</span> Passphrase never leaves this device</p>
+      </article>
+
+      <article class="panel open-panel">
+        <div class="panel-heading"><div class="panel-icon purple-icon" aria-hidden="true">↗</div><div><p class="panel-kicker">PICK UP WHERE YOU LEFT OFF</p><h2>Decrypt Existing Message</h2></div><span class="step-number">02</span></div>
+        <p class="panel-description">Choose or drop a saved CryptoPad note, or paste an encrypted packet. Use its master key to decrypt saved notes.</p>
+        <form id="decrypt-form" class="form-stack">
+          <label class="dropzone" id="landing-dropzone" for="landing-file-input" tabindex="0" aria-describedby="landing-file-help">
+            <span class="upload-icon" aria-hidden="true">↑</span>
+            <strong>Drop an encrypted note here or <u>choose a file</u></strong>
+            <span id="landing-file-help">CryptoPad .txt notes and JSON packets</span>
+            <input id="landing-file-input" type="file" accept=".txt,.json,text/plain,application/json" aria-label="Choose an encrypted CryptoPad note file">
+          </label>
+          <label for="encrypted-packet">Encrypted note file (.txt) or packet (JSON)</label>
+          <textarea id="encrypted-packet" name="packet" rows="4" placeholder="Choose a file above or paste a saved .txt note / JSON packet" required></textarea>
+          <label for="existing-master-key">Master key (for saved .txt files)</label>
+          <input id="existing-master-key" name="master_key" type="password" autocomplete="current-password" placeholder="Enter the master key used when saving" minlength="12">
+          <button class="button button-secondary button-full" type="submit">Decrypt Message <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="panel-footnote"><span aria-hidden="true">◉</span> Verification happens locally</p>
+      </article>
+    </section>
+
+    <section class="telemetry container" aria-label="Security and runtime properties">
+      <span class="telemetry-label">SYSTEM PROFILE</span><span><i class="status-dot"></i> Local RAM execution</span><span>ElGamal 2048-bit group</span><span>HKDF-SHA256 + AES-256-GCM</span><span>Zero cloud dependencies</span>
+    </section>
+
+    <!-- CSS :target keeps both reference guides reachable without blocking the page. -->
+    <section id="user-guide" class="dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="user-guide-title">
+      <a class="dialog-backdrop" href="#home" aria-label="Close user guide"></a>
+      <article class="dialog-card">
+        <div class="dialog-heading"><div><p class="panel-kicker">QUICK START</p><h2 id="user-guide-title">CryptoPad user guide</h2></div><a class="close-button" href="#home" aria-label="Close">×</a></div>
+        <p class="dialog-intro">CryptoPad encrypts text locally in this app. You can type a note or import a plain text file, then save the encrypted result as a protected CryptoPad .txt file.</p>
+        <ol class="math-steps">
+          <li><span class="math-number">01</span><div><h3>Start a session</h3><p>Create a master key with at least 12 characters and confirm it. Keep it safe: saved notes need this key to decrypt.</p></div></li>
+          <li><span class="math-number">02</span><div><h3>Write or select a file</h3><p>In the workspace, type in the editor or choose a .txt file. You can also drop a text file onto the editor. Its contents are loaded into the editor for encryption.</p></div></li>
+          <li><span class="math-number">03</span><div><h3>Encrypt and save</h3><p>Select “Encrypt message” to create an encrypted packet. Select “Save as .txt” to download a note that includes the packet and a master-key-protected private key.</p></div></li>
+          <li><span class="math-number">04</span><div><h3>Open and decrypt a note</h3><p>On this page, choose or drop a saved CryptoPad .txt file (or paste its contents), enter the same master key, and select “Decrypt Message”. Raw JSON packets can also be decrypted in the original active workspace session.</p></div></li>
+        </ol>
+        <p class="dialog-note">Educational prototype only. Avoid entering sensitive information. A lost master key cannot be recovered.</p>
+        <a class="button button-primary dialog-close" href="#home">Got it</a>
+      </article>
+    </section>
+
+    <!-- CSS :target provides a keyboard reachable explainer without app state. -->
+    <section id="elgamal-guide" class="dialog-overlay" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+      <a class="dialog-backdrop" href="#home" aria-label="Close ElGamal guide"></a>
+      <article class="dialog-card">
+        <div class="dialog-heading"><div><p class="panel-kicker">THE MATH BEHIND THE MARK</p><h2 id="guide-title">How ElGamal works</h2></div><a class="close-button" href="#home" aria-label="Close">×</a></div>
+        <p class="dialog-intro">ElGamal uses a public key to establish a shared secret with a fresh random value. CryptoPad then derives an AES key and uses authenticated encryption for the note content.</p>
+        <ol class="math-steps">
+          <li><span class="math-number">01</span><div><h3>Key generation</h3><p>Choose private x and publish y = gˣ mod p.</p></div></li>
+          <li><span class="math-number">02</span><div><h3>ElGamal encapsulation</h3><p>Choose fresh random k; compute c₁ = gᵏ mod p and shared secret yᵏ mod p.</p></div></li>
+          <li><span class="math-number">03</span><div><h3>Hybrid encryption</h3><p>Derive an AES-256 key with HKDF-SHA256, then encrypt the message using AES-GCM.</p></div></li>
+          <li><span class="math-number">04</span><div><h3>Decryption</h3><p>The private key computes c₁ˣ mod p to recreate the shared secret and decrypt/authenticate the message.</p></div></li>
+        </ol>
+        <p class="dialog-note">Educational prototype only. Use a vetted, standardized protocol and security review for real sensitive information.</p>
+        <a class="button button-primary dialog-close" href="#home">Got it, thanks</a>
+      </article>
+    </section>
+
+  </main>
+
+<footer class="site-footer container"><span>© 2025 CryptoPad <i>·</i> Built for your privacy</span><a href="#elgamal-guide">How encryption works <span aria-hidden="true">↗</span></a></footer>
+<dialog id="decrypt-dialog" class="decrypt-dialog" aria-labelledby="decrypt-dialog-title">
+  <div class="dialog-heading"><div><p class="panel-kicker">CRYPTOPAD RESULT</p><h2 id="decrypt-dialog-title">Decrypted message</h2></div><button class="close-button" id="close-decrypt-dialog" type="button" aria-label="Close">×</button></div>
+  <pre id="decrypted-message" class="decrypted-message"></pre>
+  <button class="button button-primary dialog-done" id="decrypt-dialog-done" type="button">Done</button>
+</dialog>
+<script src="app.js"></script>
+</body>
+</html>
